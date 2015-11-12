@@ -32,20 +32,29 @@ def get_query(query_string, search_fields):
             
 
             q = Q(**{"%s__icontains" % field_name: term})
-            #print 'q: %s' % q
+
             if or_query is None:
                 or_query = q
-                #print 'or_query is None: %s' % or_query
+
             else:
                 or_query = or_query | q
-                #print 'or_query is Not None: %s' % or_query
 
         if query is None:
             query = or_query
-            #print 'query is None: %s' % query
+
         else:
-            query = query | or_query
-            #print 'query is Not None: %s' % query
+            """
+            Change '|' to '&' for more strict search, for example 'foo bar' in the search
+            bar will return records that contain BOTH words, instead of records that 
+            contain at least one of them. 
+
+            This is useful in some cases and is left for the admin to decide. For example,
+            on a blog you might want to look up posts that contain the words Python or
+            Django. This is when '|' is more suitable, because '&' would only return posts
+            that contain both Python and Django, so you're missing out on Python posts.
+            """
+            query = query | or_query  
+
     return query
 
 
@@ -54,5 +63,5 @@ def search_handler(query_string, model_fields):
 
     for model_name, fields in model_fields.iteritems():
         queries[model_name] = get_query(query_string, fields)
-    #print queries
+
     return queries
