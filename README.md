@@ -21,7 +21,7 @@ http://julienphalip.com/post/2825034077/adding-search-to-a-django-site-in-a-snap
 
 3. Write your views!
  
-# Methods
+# Functions
 
 * **``django_simple_search2.search_handler(query_string, model_fields)``**
 
@@ -143,6 +143,6 @@ def search(request, template_name='search_results.html'):
 
 This view performs a search on two models, and allows the template to display results separately for both of them. This is perfect for a blog, where a user might want to get results both for posts and tags with one search. If you are not fond of your context growing bigger, you can put everything into a dictionary and pass it as a whole. Once again - it's all up to you.
 
-# TODO's
+### TODO's
 
 * Setting to give control over multi-word query string search accuracy (return records that contain all words, or at least one of them).
