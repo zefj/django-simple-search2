@@ -14,7 +14,7 @@ http://julienphalip.com/post/2825034077/adding-search-to-a-django-site-in-a-snap
 
 ``pip install git+https://github.com/zefj/django-simple-search2``
 
-2. Add ``django_simple_search2`` to your ``INSTALLED_APPS``.
+2. Add ``django_simple_search2`` to your ``INSTALLED_APPS``
 
 3. Put the import statement at the top of your views.py
 
@@ -22,6 +22,7 @@ http://julienphalip.com/post/2825034077/adding-search-to-a-django-site-in-a-snap
 
 
 ``django_simple_search2.search_handler(query_string, model_fields)``
+
 	This function takes two arguments and returns a dictionary with queries. It is the only function of this module you need to perform a search.
 
 	Arguments:
