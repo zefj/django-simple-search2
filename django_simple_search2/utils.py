@@ -61,7 +61,10 @@ def get_query(query_string, search_fields):
 def search_handler(query_string, model_fields): 
     queries = {}
 
-    for model_name, fields in model_fields.iteritems():
-        queries[model_name] = get_query(query_string, fields)
+    if query_string:
+        for model_name, fields in model_fields.iteritems():
+            queries[model_name] = get_query(query_string, fields)
+    else:
+        return
 
     return queries
