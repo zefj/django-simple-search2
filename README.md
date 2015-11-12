@@ -2,48 +2,54 @@
 
 Search functionality for your Django app simplified.
 
-This module enables simple-to-use search functionality for small to medium applications, that don't require big, complex search engines. ``django-simple-search2`` provides the minimum needed for having a search feature on your website, while at the same time leaving a loot of room for customization, such as implementing search on multiple models, in various views, or adding additional filters before performing the search.
+This module implements simple to use search functionality for small to medium applications, that don't require big, complex search engines. ``django-simple-search2`` provides the minimum needed for having a search feature on your website, while at the same time leaving a loot of room for customization, such as enabling search on multiple models, in various views, adding additional filters or chaining other refinements.
 
 This module is based on an article by Julien Phalip:
 
 http://julienphalip.com/post/2825034077/adding-search-to-a-django-site-in-a-snap
 
+# Installation
+
+  pip install git+https://github.com/zefj/django-simple-search2
+
 # Usage
 
-1. Install the module:
+1. Add `django_simple_search2` to your ``INSTALLED_APPS``
+2. Put the import statement at the top of your views.py
 
-``pip install git+https://github.com/zefj/django-simple-search2``
+    from django_simple_search2 import search_handler
 
-2. Add ``django_simple_search2`` to your ``INSTALLED_APPS``
+3. Write your views!
+ 
+# Methods
 
-3. Put the import statement at the top of your views.py
+* **``django_simple_search2.search_handler(query_string, model_fields)``**
 
-``from django_simple_search2 import search_handler``
+ This function takes two arguments and returns a dictionary with queries. It is the only function of this module you need to perform a search.
 
+  **Arguments:**
 
-``django_simple_search2.search_handler(query_string, model_fields)``
+  * ``query_string``
 
-	This function takes two arguments and returns a dictionary with queries. It is the only function of this module you need to perform a search.
+  The query string from an input field on your website, preferably just assign ``request.GET['q']`` to it, unless your input field name parameter is not ``name="q"``.
 
-	Arguments:
-		``query_string``
-			The query string from an input field on your website, preferably ``request.GET['q']``, if your input field name parameter is ``name="q"``.
+  * ``model_fields``
 
-		``model_fields``
-			A dictionary of model fields to perform search on, defined like so: 
+  A dictionary of model fields to perform search on, defined like so: 
 
-			``model_fields = {
-			    'Post': ['title', 'text', 'tags__name'],
-			    'Tag': ['name']
-			}``
+            model_fields = {
+                'Post': ['title', 'text', 'tags__name'],
+                'Tag': ['name']
+            }
 
-			The keys should be verbose (preferably model names, but you can set whatever you like), you will be looking the object returned by ``search_handler`` up.
+  The keys should be **verbose** (preferably model names, but you can set whatever you like), you will be looking the object returned by ``search_handler`` up.
 
-	Returns:
-		``queries``
-			A dictionary of keys provided in model_fields and corresponding queries in values, ready to put into `model.object.filter()` call. If an empty ``query_string`` is passed, the function returns ``None``. 
+  **Returns:**
 
-4. Write your views!
+  * ``queries``
+
+  A dictionary of keys provided in model_fields and corresponding queries in values, ready to put into `model.object.filter()` call. If an empty ``query_string`` is passed, the function returns ``None``. 
+
 
 # Example search views utilising this module
 
@@ -70,19 +76,19 @@ def search(request, template_name='mainsite/search_results.html'):
                               context_instance=RequestContext(request))
 ```
 
-This is an example of performing a single model search. The most important line is this: ``queries = search_handler(query_string, model_fields)``, whatever else you do in the view is up to you. This enables you to customize your view however you like. You can chain additional filters, perform search on many models and create a separate variable for every one of them, or throw them into a dictionary and pass it to the context as one. For example, here's a bit more complex view:
+This is an example of performing a single model search. **The most important line is this: ``queries = search_handler(query_string, model_fields)``**, whatever else you do in the view is up to you. This enables you to customize your view however you like. You can chain additional filters, perform search on many models and create a separate variable for every one of them, or throw them into a dictionary and pass it to the context as one. For example, here's a bit more complex view:
 
 ```python
 def search(request, template_name='search_results.html'):
 
-	model_fields = {
-		'Contact': ['url', 'email'],
-	}
+  model_fields = {
+    'Contact': ['url', 'email'],
+  }
 
     query_string = request.GET['q']
- 	queries = search_handler(query_string, model_fields)
+  queries = search_handler(query_string, model_fields)
 
- 	if queries:
+  if queries:
         if request.user.is_superuser:
             found_entries = Contact.objects.select_related().filter(
                 queries['Contact'])
@@ -93,7 +99,7 @@ def search(request, template_name='search_results.html'):
         paginated_contacts = paginator(found_entries, request.GET.get('page'))
 
     else:
-    	paginated_contacts = None
+      paginated_contacts = None
 
     return render_to_response('clovercrm/search_results.html',
                               {'query_string': query_string,
@@ -102,7 +108,7 @@ def search(request, template_name='search_results.html'):
                               context_instance=RequestContext(request))
 ```                              
 
-As you can see, this view has an additional conditional statement that changes the query appropriately. In this case, if the user performing the search is not authorised to view some records, they will not be included in search results. It also uses pagination to display results.
+As you can see, this view has an additional conditional statement that changes the query appropriately. In this case, if the user performing a search is not authorised to see some records, they will not be included in the search results. It also uses pagination to display results.
 
 Here's an example of a view that utilises multiple model search, as well as pagination for one of them and ``distinct()`` method to make sure there are no duplicates:
 
@@ -120,7 +126,7 @@ def search(request, template_name='search_results.html'):
     if queries:
 
         found_post_entries = Post.objects.filter(queries['Post']).distinct()
-		found_tag_entries = Tag.objects.filter(queries['Tag']).distinct()
+    found_tag_entries = Tag.objects.filter(queries['Tag']).distinct()
         
         paginated_found_post_entries = paginator(found_post_entries, request.GET.get('page'))
 
